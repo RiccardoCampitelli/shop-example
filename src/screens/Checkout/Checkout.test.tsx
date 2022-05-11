@@ -1,7 +1,4 @@
-import {
-  render,
-  screen,
-} from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ShoppingBasketContextProvider } from "context/ShoppingBasketContext";
 import { rest, server } from "testServer";
@@ -37,15 +34,15 @@ describe("Checkout", () => {
 
     expect(await screen.findByText("USD")).toBeInTheDocument();
 
-    expect(screen.getByTestId("basket-amount")).toHaveTextContent("2000.00 £");
+    expect(screen.getByText(/amount: 2000\.00 £/i)).toHaveTextContent(
+      "2000.00 £"
+    );
 
     typeCurrency();
 
     pressEnter();
 
-    expect(screen.getByTestId("basket-amount")).not.toHaveTextContent(
-      "2000.00 £"
-    );
+    expect(screen.queryByText(/amount: 2000\.00 £/i)).not.toBeInTheDocument()
   });
 
   describe("When currency options request fails", () => {
@@ -73,11 +70,9 @@ describe("Checkout", () => {
 
 const clickChangeButton = () => userEvent.click(screen.getByText("Change"));
 
-const typeCurrency = () =>
-  userEvent.type(screen.getByTestId("currency-autocomplete"), "USD");
+const typeCurrency = () => userEvent.type(screen.getByRole("textbox"), "USD");
 
-const pressEnter = () =>
-  userEvent.type(screen.getByTestId("currency-autocomplete"), "{enter}");
+const pressEnter = () => userEvent.type(screen.getByRole("textbox"), "{enter}");
 
 const renderScreen = () => {
   const mockBasket = {
